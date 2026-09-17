@@ -1,0 +1,22 @@
+{
+  "_readme": "Pilot-only expected outcome for the new missing-mandatory-sections case, kept separate from courses/gold-labels.json so it doesn't touch the curated 8-case corpus. Never fed to or read by course-reviewer/curriculum-auditor/verdict-writer -- reference/scoring use only.",
+  "file": "experiments/cases/missing_sections_CPE599.md",
+  "course_code": "CPE599",
+  "category": "missing_sections",
+  "expected_verdict": "REVISE",
+  "expected_weight_sum": 100,
+  "injected_defect": {
+    "type": "missing_mandatory_sections",
+    "location": "Section 3.5 (Scoring Criteria Checklist) and all of Section 4 (Course Policies)",
+    "detail": "Document ends immediately after the assessment table's 'Total: 100' line. No rubric/scoring-criteria section and no Course Policies section (attendance, deadlines, academic integrity, plagiarism, AI Tools & Critical Use) are present at all -- distinct from the existing blocker_* cases, which are content-correctness defects on an otherwise structurally complete document.",
+    "expected_checklist_fails": {
+      "3.5": "minor",
+      "4.1": "minor",
+      "4.2": "minor",
+      "4.3": "major",
+      "4.4": "major",
+      "4.5": "minor"
+    },
+    "expected_counts": {"blocker": 0, "major": 2, "minor": 4}
+  }
+}
