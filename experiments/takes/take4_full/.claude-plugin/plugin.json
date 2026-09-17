@@ -1,0 +1,11 @@
+{
+  "name": "course-spec-qa-take4-full",
+  "displayName": "Course Specification QA — Take 4 (Full plugin)",
+  "version": "0.1.0-experiment",
+  "description": "Isolation copy for the controlled ablation experiment. Full plugin: skills + command + agents + hooks, byte-identical to the original plugin's components.",
+  "license": "MIT",
+  "skills": "./skills",
+  "commands": "./commands",
+  "agents": "./agents",
+  "hooks": "./hooks/hooks.json"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "course-spec-qa-take3-agents",
+  "displayName": "Course Specification QA — Take 3 (+Agents)",
+  "version": "0.1.0-experiment",
+  "description": "Isolation copy for the controlled ablation experiment. Skills + command + the course-reviewer/curriculum-auditor/verdict-writer subagents — no hooks.",
+  "license": "MIT",
+  "skills": "./skills",
+  "commands": "./commands",
+  "agents": "./agents"
+}

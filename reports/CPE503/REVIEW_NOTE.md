@@ -1,0 +1,39 @@
+# Review Note — CPE503: Game Programming
+
+**Verdict:** RETURN
+
+## Findings
+
+### [BLOCKER] 2.5 — Section 2 -> Learning Outcomes table -> row 'CLO1'
+> | CLO1 | Give students a foundation in game design, both individually and in teams | Understand | - |
+
+CLO1 does not map to any PLO ID; the PLO column contains a placeholder dash ('-') instead of a PLO code.
+
+**Fix:** Add at least one PLO code (e.g. PLO1) to the PLO column of the CLO1 row, referencing references/plo-catalog.md.
+
+### [BLOCKER] 2.5 — Section 2 -> Learning Outcomes table -> row 'CLO1'
+> | CLO1 | Give students a foundation in game design, both individually and in teams | Understand | - |
+
+CLO1 has no PLO mapping and the spec states no justification for the omission (e.g. no note that this is a 0-unit/unassessed outcome). Per plo-mapping-standard, this fails the catalog's validity rule outright. Beyond the structural defect course-reviewer already logged (F001), this has a distinct accreditation consequence: CLO2 maps to PLO2 and CLO3 maps to PLO3, but CLO1 — the only CLO whose description explicitly invokes teamwork ("both individually and in teams") and foundational knowledge — contributes nothing to any course-to-outcome mapping matrix. If this pattern held across the program, PLOs that only CLO1-type outcomes would plausibly cover (e.g. PLO9 Individual and Teamwork, or PLO1 Engineering Knowledge) would be undercounted in a TABEE self-study rollup, since this course's only verifiable contributions are to PLO2 and PLO3.
+
+**Fix:** Add at least one valid PLO code from plo-catalog.md to CLO1's PLO column — PLO9 (Individual and Teamwork) is a plausible fit given the "both individually and in teams" language, or PLO1 (Engineering Knowledge) if the intent is foundational subject coverage — or, if intentionally left unmapped, add an explicit stated justification per plo-catalog.md's validity rule.
+
+### [MAJOR] 3.6 — Section 3 -> Assessment table -> row 'Individual'
+> | Individual | 29.5 | CLO1, CLO2 |
+
+CLO2's effective Bloom level is Evaluate (see the CLO2 verb-classification finding below, verb "critique"). CLO2's only mapped assessment component is "Individual" (29.5%), and neither the assessment table nor the Scoring Criteria Checklist describes what this component actually is (assignment, exam, quiz, critique report, etc.). Per the congruence rule, a CLO claiming Evaluate-level demand must be mapped to at least one component demonstrably of the critique/peer-review/justified-design-choice type; the spec as written gives no evidence that "Individual" meets this bar.
+
+**Fix:** Clarify in Section 3 (or the rubric) what the "Individual" component consists of, e.g. rename it "Individual design critique report" if that is the intent, or add a distinct critique-type component and map CLO2 to it so the Evaluate-level claim has congruent evidence.
+
+### [MINOR] 2.4 — Section 2 -> Learning Outcomes table -> row 'CLO2'
+> | CLO2 | Develop skills to analyze and critique the design of games made by others and by oneself | Analyze | PLO2 |
+
+CLO2 chains three verbs: "develop", "analyze", and "critique". Judgment call (documented per bloom-verb-rules): "develop" here takes "skills" as its object ("develop skills to..."), which is standard auxiliary phrasing for skill acquisition rather than a distinct assessed action performed on the games themselves, so it is not counted as the operative verb for classification purposes. Taking "analyze" and "critique" as the actual content-bearing verbs (both act on "the design of games"), the highest is "critique", which the dictionary lists at Evaluate level. This makes CLO2's verb-derived level (Evaluate) higher than its stated level (Analyze) — the CLO under-claims its own cognitive demand. Per bloom-verb-rules methodology, under-claiming is logged as Minor (as opposed to Major for over-claiming), which is why this finding's severity differs from checklist.md's generic 2.4 default of Major.
+
+**Fix:** Either raise the stated Bloom level to Evaluate to match the "critique" verb, or, if Analyze is the intended ceiling, reword to drop "critique" (e.g. "analyze and compare the design of games made by others and by oneself").
+
+## Standards cited
+- plo-catalog.md "Validity rule": a bare '-' with no stated justification is not a valid empty PLO mapping, it is a missing-mapping defect
+- tabee-standard.md: "Every CLO maps to at least one PLO ... an unmapped or invalid PLO reference breaks [the TABEE course-to-outcome mapping] matrix."
+- Bloom's Taxonomy (Anderson & Krathwohl, 2001): verb 'critique' = Evaluate (level 5); CLO2 states Analyze (level 4)
+- bloom-taxonomy.md, Assessment-method congruence table: Evaluate-level CLOs require a critique assignment / peer review / justified design-choice write-up; an exam-only mapping is insufficient without quoted exam-item evidence

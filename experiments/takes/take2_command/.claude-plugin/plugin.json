@@ -1,0 +1,9 @@
+{
+  "name": "course-spec-qa-take2-command",
+  "displayName": "Course Specification QA — Take 2 (+Command)",
+  "version": "0.1.0-experiment",
+  "description": "Isolation copy for the controlled ablation experiment. Skills + the /review-spec command — no custom agents, no hooks.",
+  "license": "MIT",
+  "skills": "./skills",
+  "commands": "./commands"
+}

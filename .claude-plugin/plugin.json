@@ -7,7 +7,14 @@
     "name": "Nitith PC"
   },
   "license": "MIT",
-  "keywords": ["education", "qa", "curriculum", "tabee", "accreditation", "course-specification"],
+  "keywords": [
+    "education",
+    "qa",
+    "curriculum",
+    "tabee",
+    "accreditation",
+    "course-specification"
+  ],
   "commands": "./commands",
   "skills": "./skills",
   "hooks": "./hooks/hooks.json"

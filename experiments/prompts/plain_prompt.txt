@@ -1,0 +1,5 @@
+Review the course specification in courses/<COURSE_CODE>.md for committee approval.
+Give a verdict of APPROVE, REVISE or RETURN.
+List each finding with its severity and location.
+End with the line:
+Verdict: <APPROVE|REVISE|RETURN>
