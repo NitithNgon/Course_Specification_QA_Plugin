@@ -1,0 +1,88 @@
+{
+  "_readme": "Hand-labeled ground truth for the 8-case synthetic experiment set. Used to score the Bloom/PLO Detection Rate and false-blocker-rate metrics -- never fed to the agents themselves. Do not read this file from course-reviewer/curriculum-auditor/verdict-writer; only the human/eval-harness scoring the run should open it.",
+  "cases": [
+    {
+      "file": "clean_01_data_structures.md",
+      "course_code": "CPE201",
+      "category": "clean",
+      "expected_verdict": "APPROVE",
+      "expected_weight_sum": 100,
+      "injected_defect": null
+    },
+    {
+      "file": "clean_02_database_systems.md",
+      "course_code": "CPE305",
+      "category": "clean",
+      "expected_verdict": "APPROVE",
+      "expected_weight_sum": 100,
+      "injected_defect": null
+    },
+    {
+      "file": "clean_03_computer_networks.md",
+      "course_code": "CPE310",
+      "category": "clean",
+      "expected_verdict": "APPROVE",
+      "expected_weight_sum": 100,
+      "injected_defect": null
+    },
+    {
+      "file": "clean_04_operating_systems.md",
+      "course_code": "CPE410",
+      "category": "clean",
+      "expected_verdict": "APPROVE",
+      "expected_weight_sum": 100,
+      "injected_defect": null
+    },
+    {
+      "file": "clean_05_software_engineering.md",
+      "course_code": "CPE420",
+      "category": "clean",
+      "expected_verdict": "APPROVE",
+      "expected_weight_sum": 100,
+      "injected_defect": null
+    },
+    {
+      "file": "blocker_01_bloom_mismatch.md",
+      "course_code": "CPE501",
+      "category": "problematic",
+      "expected_verdict": "REVISE",
+      "expected_weight_sum": 100,
+      "injected_defect": {
+        "type": "bloom_verb_mismatch",
+        "location": "CLO2",
+        "detail": "Verb 'Define' is Remember-level per Bloom's Revised Taxonomy, but the stated Bloom Level is 'Create'.",
+        "secondary_defect": "assessment_congruence: CLO2 is mapped only to the closed-book Midterm Exam, with no project/design deliverable -- insufficient evidence for a Create-level (or even the correct Remember-level) claim if taken at face value as Create."
+      }
+    },
+    {
+      "file": "blocker_02_weight_95.md",
+      "course_code": "CPE502",
+      "category": "problematic",
+      "expected_verdict": "RETURN",
+      "expected_weight_sum": 95,
+      "injected_defect": {
+        "type": "weight_integrity",
+        "location": "Section 3 assessment table",
+        "detail": "Midterm 25 + Final 25 + Assignment 25 + Project 20 = 95, not 100."
+      }
+    },
+    {
+      "file": "blocker_03_missing_plo.md",
+      "course_code": "CPE503",
+      "category": "problematic",
+      "expected_verdict": "RETURN",
+      "expected_weight_sum": 100,
+      "injected_defect": {
+        "type": "missing_plo_mapping",
+        "location": "CLO1",
+        "detail": "PLO column is '-' with no stated justification. Modeled directly on the real total-cases/2110511.pdf case, which has this exact defect on all three of its CLOs."
+      }
+    }
+  ],
+  "scoring_notes": {
+    "checklist_coverage": "count of checklist.md items actually evaluated / applicable items, per case",
+    "false_blocker_rate": "on the 5 'clean' cases, any blocker-severity finding is a false positive -- should be 0/5",
+    "bloom_plo_detection_rate": "on the 3 'problematic' cases, did curriculum-auditor's findings correctly identify the injected_defect.type and location -- should be 3/3",
+    "verdict_consistency": "run each case N times (e.g. N=5); fraction of runs landing on expected_verdict, and fraction of runs identical to each other regardless of match to gold"
+  }
+}

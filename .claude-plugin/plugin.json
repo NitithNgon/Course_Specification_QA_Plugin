@@ -1,0 +1,15 @@
+{
+  "name": "course-spec-qa",
+  "displayName": "Course Specification QA",
+  "version": "0.1.0",
+  "description": "Reviews course specifications against an institutional checklist, verifies assessment weights and Bloom/PLO mapping against TABEE/TQF/Bloom's Taxonomy, and produces committee-ready review notes with an Approve/Revise/Return verdict.",
+  "author": {
+    "name": "Nitith PC"
+  },
+  "license": "MIT",
+  "keywords": ["education", "qa", "curriculum", "tabee", "accreditation", "course-specification"],
+  "commands": "./commands",
+  "agents": "./agents",
+  "skills": "./skills",
+  "hooks": "./hooks/hooks.json"
+}
