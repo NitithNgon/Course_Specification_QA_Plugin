@@ -1,4 +1,6 @@
 # Course-Spec-QA Plugin — Take 0→4 Pilot Experiment Report
+report
+https://claude.ai/artifact/Rh3JP5dLNkJeMLBrLiir6S
 
 Pilot scope (N=1 per take/case, per user selection): 2 test cases x 5 takes,
 plus one adversarial hook-block demonstration. Run 2026-09-17. Raw
