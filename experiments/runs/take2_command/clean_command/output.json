@@ -1,0 +1,111 @@
+{
+  "duration_api_ms": 91430,
+  "stop_reason": "end_turn",
+  "session_id": "971e246a-04b1-4e8e-99e0-4f92f9627803",
+  "total_cost_usd": 0.29017479999999995,
+  "usage": {
+    "input_tokens": 24,
+    "cache_creation_input_tokens": 28613,
+    "cache_read_input_tokens": 440709,
+    "output_tokens": 8655,
+    "output_tokens_details": {
+      "thinking_tokens": 4780
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 28613,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 593,
+        "cache_read_input_tokens": 50764,
+        "cache_creation_input_tokens": 2058,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2058
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-haiku-4-5-20251001": {
+      "inputTokens": 903,
+      "outputTokens": 16,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.000983,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-4-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    },
+    "claude-sonnet-5": {
+      "inputTokens": 24,
+      "outputTokens": 8655,
+      "cacheReadInputTokens": 440709,
+      "cacheCreationInputTokens": 28613,
+      "webSearchRequests": 0,
+      "costUSD": 0.2891918,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 4780,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 20,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "No `Write` calls were blocked by any hook during this run.\n\n**Note:** `/review-spec` isn't installed as a slash command in this session, so I read `commands/review-spec.md` directly and followed it manually \u2014 this plugin variant (\"take2_command\") has no `course-reviewer`/`curriculum-auditor`/`verdict-writer` subagents, so I applied the four skills (course-qa-checklist, bloom-verb-rules, plo-mapping-standard, committee-review-format) against `references/checklist.md`, `bloom-taxonomy.md`, and `plo-catalog.md` myself.\n\n## Result: CPE201 \u2014 Data Structures and Algorithms \u2192 **APPROVE** (0 blockers, 0 majors, 0 minors)\n\n- **Structure:** all 4 sections present and well-formed; assessment weights sum to exactly 100 (25+25+30+20); every component maps to a CLO; rubric checklist present; all 5 policy items present including the mandatory AI Tools statement.\n- **Bloom levels:** CLO1 \"Explain\"\u2192Understand, CLO2 \"Apply\"\u2192Apply, CLO3 \"Analyze\"\u2192Analyze \u2014 all stated levels match their verbs. No CLO reaches Evaluate/Create, so the exam-only congruence rule doesn't trigger.\n- **PLO mapping:** CLO1\u2192PLO1, CLO2\u2192PLO3, CLO3\u2192PLO2, all valid catalog entries, no obviously poor fits.\n\nWrote `reports/CPE201/findings.json` (empty), `reports/CPE201/REVIEW_NOTE.md`, and `COURSE_SPEC_REVIEW.md`. No `amendments-queue.csv` row was needed since the verdict is APPROVE.",
+  "ttft_ms": 2706,
+  "type": "result",
+  "duration_ms": 92199,
+  "uuid": "87ec65d5-390a-4a5f-a14c-bad17aa56093",
+  "ttft_stream_ms": 1407,
+  "time_to_request_ms": 325,
+  "first_content_frame_ms": 1407,
+  "queued_turn_count": 0,
+  "result_index": 0
+}

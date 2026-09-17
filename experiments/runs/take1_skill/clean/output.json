@@ -1,0 +1,111 @@
+{
+  "duration_api_ms": 77965,
+  "stop_reason": "end_turn",
+  "session_id": "e51e039e-ba01-4b59-a666-308ca9d82b01",
+  "total_cost_usd": 0.163308,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 14741,
+    "cache_read_input_tokens": 162775,
+    "output_tokens": 7074,
+    "output_tokens_details": {
+      "thinking_tokens": 5061
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 14741,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 5721,
+        "cache_read_input_tokens": 38469,
+        "cache_creation_input_tokens": 481,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 481
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "claude-haiku-4-5-20251001": {
+      "inputTokens": 954,
+      "outputTokens": 15,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.001029,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "thinkingTokens": 0,
+      "canonicalModel": "claude-haiku-4-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    },
+    "claude-sonnet-5": {
+      "inputTokens": 10,
+      "outputTokens": 7074,
+      "cacheReadInputTokens": 162775,
+      "cacheCreationInputTokens": 14741,
+      "webSearchRequests": 0,
+      "costUSD": 0.162279,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 5061,
+      "canonicalModel": "claude-sonnet-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "is_error": false,
+  "num_turns": 10,
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "I reviewed `courses/CPE201.md` against the methodology in the plugin's `course-qa-checklist`, `bloom-verb-rules`, `plo-mapping-standard`, and `committee-review-format` skills. Note: this take (`take1_skill`) is skills-only and doesn't include the actual reference files those skills point to (`references/checklist.md`, `bloom-taxonomy.md`, `plo-catalog.md`), so where I couldn't verify against a source of truth I've flagged that explicitly rather than guessing.\n\n## Findings\n\n**[MAJOR] Section 1 \u2192 Course Information \u2014 missing instructor and credit hours**\n> `**Course Code:** CPE201` / `**Course Name:** Data Structures and Algorithms`\n\nSection 1 contains only code and name. The review schema itself expects more: `committee-review-format`'s amendments-queue derives the `owner` field from \"the instructor name from Section 1,\" and credit hours are a baseline field for any official course specification (needed for registrar/accreditation records). Neither is present.\n**Fix:** Add `**Instructor:**` and `**Credit Hours:**` fields to Section 1.\n\n**[MINOR] Section 1 \u2192 Course Information \u2014 no prerequisite listed**\nA data structures/algorithms course conventionally requires a prior programming course as a prerequisite, but none is stated.\n**Fix:** Add a `**Prerequisite:**` field naming the required prior course (e.g., an intro-to-programming course).\n\n**[MINOR / ADVISORY] Section 2 \u2192 Learning Outcomes, PLO column \u2014 mapping unverifiable in this take**\n> CLO1\u2192PLO1, CLO2\u2192PLO3, CLO3\u2192PLO2\n\nAll three CLOs have non-empty, plausible PLO codes, but I cannot confirm PLO1/PLO2/PLO3 actually exist in the program's PLO catalog since `references/plo-catalog.md` isn't present in this ablation. This is a review-coverage caveat, not a confirmed defect \u2014 not counted toward the verdict below.\n\n## Checks that passed\n- **Bloom verb consistency** (Anderson & Krathwohl, 2001): CLO1 \"Explain\" = Understand \u2713, CLO2 \"Apply\" = Apply \u2713, CLO3 \"Analyze\" = Analyze \u2713 \u2014 all stated levels match their verbs.\n- **Assessment congruence:** no CLO claims Evaluate/Create level, so no exam-only-at-high-level violation.\n- **Assessment weights:** 25 + 25 + 30 + 20 = 100, matches stated total exactly.\n- **CLO coverage:** every CLO (1, 2, 3) is mapped to at least one assessment component.\n- **Scoring criteria checklist:** all three items checked.\n- **Course Policies:** attendance, deadlines, academic integrity, plagiarism, and AI-tool use are all present and clearly stated.\n\nNo blocker-severity findings exist; one major finding (missing instructor/credit hours) is open, which per the deterministic verdict table (blocker\u2192RETURN, else major\u2192REVISE, else APPROVE) yields REVISE.\n\nVerdict: REVISE",
+  "ttft_ms": 4045,
+  "type": "result",
+  "duration_ms": 78201,
+  "uuid": "c4b88cc2-96c5-460a-b9ad-938a7e7a23ab",
+  "ttft_stream_ms": 2384,
+  "time_to_request_ms": 305,
+  "first_content_frame_ms": 2385,
+  "queued_turn_count": 0,
+  "result_index": 0
+}
