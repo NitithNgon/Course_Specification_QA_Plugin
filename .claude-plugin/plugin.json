@@ -9,7 +9,6 @@
   "license": "MIT",
   "keywords": ["education", "qa", "curriculum", "tabee", "accreditation", "course-specification"],
   "commands": "./commands",
-  "agents": "./agents",
   "skills": "./skills",
   "hooks": "./hooks/hooks.json"
 }
