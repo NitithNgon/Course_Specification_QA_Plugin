@@ -31,12 +31,18 @@ reports/amendments-queue.csv - non-Approve findings queued for instructor action
 
 ## Try it locally
 
+The hooks are Python and `hooks/hooks.json` invokes them as `python`. On a
+machine where only `python3` is on PATH, change the interpreter there — a
+missing interpreter exits 127, which Claude Code treats as a non-blocking
+error, so the write proceeds and blocker enforcement disappears with no
+visible failure.
+
 ```
 claude --plugin-dir .
 ```
 then, inside the session:
 ```
-/review-spec courses/clean_01_data_structures.md
+/review-spec courses/CPE201.md
 /review-spec --all
 ```
 
@@ -61,7 +67,7 @@ on the 5 clean cases, and location-precision of findings.
 Required evidence for the report: one success case (a clean spec sailing to
 APPROVE with 0 findings), one blocked/failure case (a blocker spec where the
 PreToolUse hook actually fires — try prompting the agent, mid-review, to
-approve `blocker_02_weight_95.md` anyway and see the hook deny it), a
+approve `CPE502.md` anyway and see the hook deny it), a
 baseline-vs-plugin comparison on identical wording, and a limitations
 section (the real `total-cases/*.pdf` are good material for this — they're
 messier than the synthetic set and expose format-completeness gaps the
