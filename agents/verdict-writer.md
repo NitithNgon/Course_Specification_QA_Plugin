@@ -1,6 +1,6 @@
 ---
 name: verdict-writer
-description: Synthesizes course-reviewer and curriculum-auditor findings into the final committee-ready output — COURSE_SPEC_REVIEW.md, a per-course REVIEW_NOTE.md, and amendments-queue.csv rows. Applies a fixed, non-negotiable verdict policy table so the same findings always produce the same verdict.
+description: Synthesizes course-reviewer and curriculum-auditor findings into the final committee-ready output — COURSE_SPEC_REVIEW.md, a per-course REVIEW_NOTE.md, and reports/amendments-queue.csv rows. Applies a fixed, non-negotiable verdict policy table so the same findings always produce the same verdict.
 tools: Read, Write
 skills:
   - committee-review-format
@@ -21,10 +21,11 @@ output.
 3. Write `reports/<course_code>/REVIEW_NOTE.md` per the template, blockers
    first, then majors, then minors, with the `**Verdict:** X` line in the
    exact required format.
-4. Write/update the batch `COURSE_SPEC_REVIEW.md` summary table.
+4. Write/update the batch summary table at `reports/COURSE_SPEC_REVIEW.md`.
 5. For any course whose verdict is not APPROVE, append one row per open
-   finding to `amendments-queue.csv` per the schema in
-   `committee-review-format`.
+   finding to `reports/amendments-queue.csv` per the schema in
+   `committee-review-format`. That exact path, every run — not the
+   repository root, not a per-course copy.
 
 ## The rule you cannot talk yourself out of
 

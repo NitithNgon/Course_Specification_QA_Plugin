@@ -1,6 +1,6 @@
 ---
 name: committee-review-format
-description: Use when recording findings, deciding a verdict, or writing COURSE_SPEC_REVIEW.md, a per-course review note, or an amendments-queue.csv row. Defines the shared findings schema, the deterministic verdict policy table, and the exact committee-ready output formats. Loaded by course-reviewer, curriculum-auditor, and verdict-writer.
+description: Use when recording findings, deciding a verdict, or writing COURSE_SPEC_REVIEW.md, a per-course review note, or a reports/amendments-queue.csv row. Defines the shared findings schema, the deterministic verdict policy table, and the exact committee-ready output formats. Loaded by course-reviewer, curriculum-auditor, and verdict-writer.
 ---
 
 # Committee Review Format — shared schema and templates
@@ -90,12 +90,19 @@ The `**Verdict:** X` line must appear exactly once, in that exact format
 `RETURN` in caps) — the PreToolUse hook pattern-matches this literal string.
 Do not paraphrase it, translate it, or add extra words on that line.
 
-## `amendments-queue.csv` row (append one row per course that is not APPROVE)
+## `reports/amendments-queue.csv` row (append one row per course that is not APPROVE)
+
+The path is exactly `reports/amendments-queue.csv` — one file for the whole
+run, alongside `reports/audit-log.jsonl`. Never write it to the repository
+root and never create a per-course copy: a split queue means an instructor
+fixing one file silently misses rows written to the other.
 
 Columns, in order:
 ```
 course_code,course_name,verdict,finding_id,severity,section,summary,suggested_fix,owner,due_date
 ```
+Write the header row only when creating the file; append rows without a
+header when it already exists.
 `owner` is the instructor name from Section 1 if present, else
 `"unassigned"`. `due_date` is left blank for a human to fill in unless the
 command was given an explicit turnaround window.

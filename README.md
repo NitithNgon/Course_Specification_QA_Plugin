@@ -26,7 +26,7 @@ reports/                     - generated output (COURSE_SPEC_REVIEW.md,
 total-cases/                 - 6 REAL course specs (PDF), used as a separate
                                 format-robustness / generalization corpus,
                                 not the controlled experiment set
-amendments-queue.csv         - non-Approve findings queued for instructor action
+reports/amendments-queue.csv - non-Approve findings queued for instructor action
 ```
 
 ## Try it locally

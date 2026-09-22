@@ -22,8 +22,9 @@ depends on course-reviewer's extraction and verdict-writer depends on both:
    the full list of course codes in this batch, so it can also produce the
    program-level PLO coverage rollup after the last course).
 3. Invoke the `verdict-writer` subagent with the course code(s) to produce
-   `REVIEW_NOTE.md`, update `COURSE_SPEC_REVIEW.md`, and append any needed
-   `amendments-queue.csv` rows.
+   `reports/<course_code>/REVIEW_NOTE.md`, update
+   `reports/COURSE_SPEC_REVIEW.md`, and append any needed
+   `reports/amendments-queue.csv` rows.
 
 After the pipeline completes for all courses in scope, report a short
 summary table to the user: course code, verdict, blocker/major/minor
