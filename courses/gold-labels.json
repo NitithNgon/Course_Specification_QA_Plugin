@@ -2,7 +2,7 @@
   "_readme": "Hand-labeled ground truth for the 8-case synthetic experiment set. Used to score the Bloom/PLO Detection Rate and false-blocker-rate metrics -- never fed to the agents themselves. Do not read this file from course-reviewer/curriculum-auditor/verdict-writer; only the human/eval-harness scoring the run should open it.",
   "cases": [
     {
-      "file": "clean_01_data_structures.md",
+      "file": "CPE201.md",
       "course_code": "CPE201",
       "category": "clean",
       "expected_verdict": "APPROVE",
@@ -10,7 +10,7 @@
       "injected_defect": null
     },
     {
-      "file": "clean_02_database_systems.md",
+      "file": "CPE305.md",
       "course_code": "CPE305",
       "category": "clean",
       "expected_verdict": "APPROVE",
@@ -18,7 +18,7 @@
       "injected_defect": null
     },
     {
-      "file": "clean_03_computer_networks.md",
+      "file": "CPE310.md",
       "course_code": "CPE310",
       "category": "clean",
       "expected_verdict": "APPROVE",
@@ -26,7 +26,7 @@
       "injected_defect": null
     },
     {
-      "file": "clean_04_operating_systems.md",
+      "file": "CPE410.md",
       "course_code": "CPE410",
       "category": "clean",
       "expected_verdict": "APPROVE",
@@ -34,7 +34,7 @@
       "injected_defect": null
     },
     {
-      "file": "clean_05_software_engineering.md",
+      "file": "CPE420.md",
       "course_code": "CPE420",
       "category": "clean",
       "expected_verdict": "APPROVE",
@@ -42,7 +42,7 @@
       "injected_defect": null
     },
     {
-      "file": "blocker_01_bloom_mismatch.md",
+      "file": "CPE501.md",
       "course_code": "CPE501",
       "category": "problematic",
       "expected_verdict": "REVISE",
@@ -55,7 +55,7 @@
       }
     },
     {
-      "file": "blocker_02_weight_95.md",
+      "file": "CPE502.md",
       "course_code": "CPE502",
       "category": "problematic",
       "expected_verdict": "RETURN",
@@ -67,7 +67,7 @@
       }
     },
     {
-      "file": "blocker_03_missing_plo.md",
+      "file": "CPE503.md",
       "course_code": "CPE503",
       "category": "problematic",
       "expected_verdict": "RETURN",
