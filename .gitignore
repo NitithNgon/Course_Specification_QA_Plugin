@@ -1,0 +1,4 @@
+# RULES FOR IGNORING
+
+## Python
+__pycache__
