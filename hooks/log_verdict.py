@@ -16,7 +16,11 @@ the verdict policy when it is a resolved finding behaving correctly.
 Severity and status are normalized the same way block_approve_with_blocker.py
 normalizes them, so the log and the enforcement agree on what 'blocker' and
 'open' mean.
+
+Each line also records rulebook_sha256, the sha256 of references/checklist.md,
+so a logged verdict names the rule version that produced it.
 """
+import hashlib
 import json
 import os
 import re
@@ -30,6 +34,23 @@ def norm(value):
     if value is None:
         return ""
     return str(value).strip().lower()
+
+
+def checklist_path():
+    # Same resolution as validate_findings.py: env override, else ../references/checklist.md.
+    override = os.environ.get("COURSE_SPEC_QA_CHECKLIST")
+    if override:
+        return override
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(here, "..", "references", "checklist.md")
+
+
+def rulebook_sha256():
+    try:
+        with open(checklist_path(), "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()
+    except OSError:
+        return None
 
 
 def main():
@@ -89,6 +110,7 @@ def main():
         "verdict": verdict,
         "finding_counts": counts,
         "resolved_count": resolved_count,
+        "rulebook_sha256": rulebook_sha256(),
     }
     try:
         with open(log_path, "a", encoding="utf-8") as f:
