@@ -15,25 +15,38 @@ curriculum-auditor:
   {
     "id": "F001",
     "source_agent": "course-reviewer",
-    "checklist_rule": "3.3",
+    "checklist_rule": "4.3",
     "severity": "blocker",
-    "section": "Section 3 -> Assessment table",
-    "quote": "Midterm 30 / Final 30 / Assignment 20 / Project 15",
+    "section": "Assessment table",
+    "quote": "| Project | Bloom's taxonomy (Create) | CLO3 | 15.00 |",
     "standard_ref": null,
-    "message": "Assessment weights sum to 95, not 100.",
-    "suggested_fix": "Increase one component by 5 points, or add a missing component, so the table sums to exactly 100.",
+    "message": "Assessment weights sum to 95 (30 + 30 + 20 + 15), not 100: short by 5.",
+    "suggested_fix": "Raise one component by 5 points, or add the missing component to the table, so the weights sum to exactly 100.",
     "status": "open"
   }
 ]
 ```
 
-- `severity`: one of `blocker`, `major`, `minor`.
+- `checklist_rule`: a rule ID from `references/checklist.md`.
+- `severity`: `blocker`, `major` or `minor` — exactly the severity the
+  checklist gives that rule.
+- `source_agent`: the rule's Owner in the checklist (`course-reviewer` or
+  `curriculum-auditor`).
+- `section`: a pointer precise enough to find the row; `quote`: the text as
+  printed, the `-` as printed, or `"(absent)"` for a missing section.
 - `standard_ref`: a citation string when curriculum-auditor produced the
   finding (e.g. `"Bloom's Taxonomy (Anderson & Krathwohl, 2001)"`,
-  `"TABEE / plo-catalog.md"`); `null` for pure structural findings.
-- `status`: `open` until verdict-writer (or a human) marks it `resolved`.
-  **Never** delete a finding to make a verdict cleaner — mark it resolved
-  with a `resolution_note`, so the audit trail stays honest.
+  `"plo-catalog.md"`); `null` for structural findings.
+- `status`: `open` until a human reviewer marks it `resolved` with a
+  `resolution_note`. **Never** delete a finding to make a verdict cleaner;
+  the audit trail stays honest.
+- One finding per failing row or field (`checklist.md`, "Findings
+  granularity").
+
+The `validate_findings.py` PreToolUse hook enforces this schema on every
+write: it blocks a missing field, a rule not in the checklist, a severity or
+source agent that differs from the checklist, a resolved finding without a
+note, and any change to or removal of an existing finding.
 
 ## Deterministic verdict policy (verdict-writer MUST use this table, not judgment)
 
@@ -44,7 +57,7 @@ curriculum-auditor:
 | **APPROVE** | No open findings with `severity: blocker` or `severity: major` (open minors are allowed, listed as advisory notes) |
 
 This table is the entire verdict logic. If you find yourself reasoning
-"but this blocker is minor in spirit" — that reasoning is exactly what the
+"but this blocker is minor in spirit", that reasoning is what the
 PreToolUse hook exists to override. Do not talk yourself into APPROVE with
 an open blocker; write REVISE or RETURN and let the instructor fix the
 underlying finding instead.
@@ -90,7 +103,7 @@ The `**Verdict:** X` line must appear exactly once, in that exact format
 `RETURN` in caps) — the PreToolUse hook pattern-matches this literal string.
 Do not paraphrase it, translate it, or add extra words on that line.
 
-## `reports/amendments-queue.csv` row (append one row per course that is not APPROVE)
+## `reports/amendments-queue.csv` row (one row per open finding of a course that is not APPROVE)
 
 The path is exactly `reports/amendments-queue.csv` — one file for the whole
 run, alongside `reports/audit-log.jsonl`. Never write it to the repository
@@ -103,6 +116,7 @@ course_code,course_name,verdict,finding_id,severity,section,summary,suggested_fi
 ```
 Write the header row only when creating the file; append rows without a
 header when it already exists.
-`owner` is the instructor name from Section 1 if present, else
-`"unassigned"`. `due_date` is left blank for a human to fill in unless the
-command was given an explicit turnaround window.
+`owner` is the course coordinator named on the form; if none is named, the
+first listed instructor; if neither, `"unassigned"`. `due_date` is left
+blank for a human to fill in unless the command was given an explicit
+turnaround window.

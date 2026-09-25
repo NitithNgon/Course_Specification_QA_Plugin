@@ -1,39 +1,45 @@
 # Program Learning Outcome (PLO) Catalog
 
-> **⚠ TEMPLATE — REPLACE WITH THE PROGRAM'S OFFICIAL, TABEE-SUBMITTED PLO
-> CATALOG BEFORE ANY REAL COMMITTEE USE.** This is a representative,
-> Washington-Accord-aligned placeholder built for demoing and testing the
-> plugin. Using it as-is for a real committee review would be presenting
-> fabricated institutional data as authoritative — don't do that. Swap in
-> the real curriculum's PLO list (same file path, same PLO-ID column) and
-> everything downstream (curriculum-auditor, coverage rollups) keeps working
-> unchanged.
+> **⚠ PLACEHOLDER — REPLACE WITH THE PROGRAM'S OFFICIAL PLO CATALOG BEFORE ANY
+> REAL COMMITTEE USE.** This table is built for testing the plugin. Using it
+> for a real committee review would present made-up institutional data as
+> authoritative. Swap in the program's own PLO list from its curriculum
+> document (same file path, same `PLO ID` column) and everything downstream
+> (curriculum-auditor, the batch coverage rollup) keeps working unchanged.
 
-Numbering follows the Washington Accord 12 Graduate Attributes
-(see `references/tabee-standard.md`) as an example convention — a real
-catalog may renumber/reword these per the program's own TQF2 filing.
+Built on the IEA Washington Accord graduate attribute profile, GAPC version
+2021.1 (WA1-WA11; see `tabee-standard.md`), with one PLO per attribute. Each
+PLO carries an example tag for the learning-outcome domain(s) of Thailand's
+2022 higher-education qualification standards (knowledge, skills, ethics,
+character); the program's curriculum document is the authority for the real
+tagging. A real program usually has fewer, broader PLOs, each mapped to
+several WA attributes.
 
-| PLO ID | Statement | WA Graduate Attribute |
-|---|---|---|
-| PLO1 | Apply mathematics, science, and computer engineering fundamentals to solve engineering problems | 1. Engineering Knowledge |
-| PLO2 | Identify, formulate, and analyze complex computer engineering problems | 2. Problem Analysis |
-| PLO3 | Design software/hardware systems and components that meet specified requirements | 3. Design/Development of Solutions |
-| PLO4 | Conduct investigations of complex problems using research-based methods, including experiment design and data analysis | 4. Investigation |
-| PLO5 | Select and apply modern engineering and IT tools appropriately | 5. Modern Tool Usage |
-| PLO6 | Assess the impact of computer engineering solutions on society, health, and safety | 6. Engineer and Society |
-| PLO7 | Evaluate the environmental and sustainability impact of engineering work | 7. Environment and Sustainability |
-| PLO8 | Apply professional ethics and academic integrity in engineering practice | 8. Ethics |
-| PLO9 | Function effectively as an individual and as a member/leader in a team, including cross-disciplinary teams | 9. Individual and Teamwork |
-| PLO10 | Communicate technical work effectively in written, oral, and visual form | 10. Communication |
-| PLO11 | Apply project management and basic financial/economic principles to engineering projects | 11. Project Management and Finance |
-| PLO12 | Recognize the need for, and engage in, independent life-long learning | 12. Life-long Learning |
+Curriculum: placeholder, used by every course in `courses/`.
+
+| PLO ID | Statement | WA attribute (GAPC 2021.1) | Thai 2022 domain |
+|---|---|---|---|
+| PLO1 | Apply knowledge of mathematics, natural science, computing and computer engineering fundamentals to develop solutions to complex engineering problems | WA1 Engineering Knowledge | Knowledge |
+| PLO2 | Identify, formulate, research and analyze complex computer engineering problems, reaching substantiated conclusions | WA2 Problem Analysis | Skills |
+| PLO3 | Design creative solutions, systems, components or processes that meet identified needs, with appropriate regard for safety, whole-life cost and societal and environmental considerations | WA3 Design/development of solutions | Skills |
+| PLO4 | Conduct investigations of complex problems using research methods, including design of experiments and analysis and interpretation of data, to reach valid conclusions | WA4 Investigation | Skills |
+| PLO5 | Create, select and apply appropriate techniques, resources and modern engineering and IT tools, recognizing their limitations | WA5 Tool Usage | Skills |
+| PLO6 | Analyze and evaluate the sustainable-development impacts of engineering solutions on society, the economy, health and safety, legal frameworks and the environment | WA6 The Engineer and the World | Skills; Ethics |
+| PLO7 | Apply ethical principles, commit to professional ethics and norms of engineering practice, and act within relevant national and international laws | WA7 Ethics | Ethics |
+| PLO8 | Function effectively as an individual, and as a member or leader in diverse and inclusive teams, face to face, remote and distributed | WA8 Individual and Collaborative Team work | Character |
+| PLO9 | Communicate effectively and inclusively on complex engineering activities, in written reports, design documentation and presentations | WA9 Communication | Skills |
+| PLO10 | Apply engineering management principles and economic decision-making to one's own work, in teams and in managing projects | WA10 Project Management and Finance | Skills |
+| PLO11 | Recognize the need for, and engage in, independent and life-long learning, adapting to new and emerging technologies | WA11 Lifelong learning | Character |
 
 ## Validity rule
 
-A course spec's PLO column is **valid** only if every value is either:
-- A `PLO ID` that appears verbatim in this table, or
-- Explicitly empty **with a stated reason** the committee has accepted (rare —
-  e.g. a 0-unit seminar with no assessed outcome). A bare `-` with no
-  justification is **not** a valid empty value; it is a missing-mapping
-  defect (see the real `total-cases/2110511.pdf` case, where every CLO's
-  PLO column is `-`).
+A course spec's PLO references are **valid** only if every value is either:
+
+- a `PLO ID` that appears verbatim in this table, or
+- explicitly empty **with a stated reason** the committee has accepted (rare,
+  e.g. a 0-unit seminar with no assessed outcome).
+
+A bare `-` with no reason is **not** a valid empty value; it is a
+missing-mapping defect (checklist rules 2.3 and 2.4). The real
+`total-cases/2110511.pdf` has this defect in its related-PLO section and on
+all three of its CLOs.
