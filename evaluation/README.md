@@ -37,7 +37,7 @@ Verdicts: 5 APPROVE, 2 REVISE, 4 RETURN.
 Compare the take's `reports/<code>/findings.json` and `REVIEW_NOTE.md` with each file:
 
 1. **Verdict**: exact match with the expected verdict.
-2. **Hits and misses**: a reported finding matches an expected finding when it names the same course, the same location (the CLO row, the assessment row or the section) and the same defect. Each expected finding is a hit if at least one reported finding matches it, and a miss otherwise. A reported finding that names several rows matches the expected finding for each row it names.
+2. **Hits and misses**: a reported finding matches an expected finding when it names the same course, the same location (the CLO row, the assessment row or the section) and the same defect. Each expected finding is a hit if at least one reported finding matches it, and a miss otherwise. A reported finding that names several rows matches the expected finding for each row it names. Where the precedence list sends a defect to one rule, an expected finding has a "Same defect under another rule" line naming the rule a review might use instead (for example 2.5 for a `-` PLO cell); a report under that rule still matches, as a hit with the wrong rule.
 3. **Rule and severity accuracy**: for each hit, whether the reported `checklist_rule` and `severity` equal the expected ones.
 4. **Duplicates**: further reported findings matching an expected finding that is already hit are duplicates, not false positives.
 5. **Tolerated findings**: a reported finding matching a tolerated entry counts neither way.
