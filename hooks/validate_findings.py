@@ -185,7 +185,7 @@ def block(problems):
 
 def main():
     try:
-        payload = json.load(sys.stdin)
+        payload = json.loads(sys.stdin.buffer.read().decode("utf-8-sig"))
     except (json.JSONDecodeError, UnicodeDecodeError):
         sys.exit(0)
     if not isinstance(payload, dict):
