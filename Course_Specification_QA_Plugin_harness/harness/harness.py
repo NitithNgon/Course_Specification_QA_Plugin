@@ -1,6 +1,6 @@
 """The harness facade: ties connector (M1), config (M2), prompts (M3) and logging (M14).
 
-Copied from ../../Harness/harness/harness.py; only `config_agents` is new.
+Copied from ../../Harness/harness/harness.py; only `config_agents` and `log_extra` are new.
 
     h = Harness()
     res = h.llm("fast", messages, schema=..., prompt_id="extract_ticket@v2")
@@ -30,13 +30,15 @@ class Harness:
 
     def llm(self, profile: str, messages: list[dict], *, schema: dict | None = None,
             tools: list[dict] | None = None, run_id: str | None = None,
-            prompt_id: str | None = None, log: bool = True, **overrides) -> ChatResult:
-        """Call the model behind a profile. Per-call overrides win over config."""
+            prompt_id: str | None = None, log: bool = True, log_extra: dict | None = None,
+            **overrides) -> ChatResult:
+        """Call the model behind a profile. Per-call overrides win over config.
+        `log_extra` adds fields to the log line (e.g. step, stage, state), never to the request."""
         p = self.config.profile(profile)
         options = {**p.options, **overrides}
         result = self.client.chat(p.model, messages, schema=schema, tools=tools,
                                   think=p.think, keep_alive=p.keep_alive, **options)
         if log:
             self.log.llm_call(run_id=run_id or new_run_id(), profile=profile,
-                              result=result, prompt_id=prompt_id)
+                              result=result, prompt_id=prompt_id, **(log_extra or {}))
         return result

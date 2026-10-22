@@ -28,7 +28,8 @@ RW = {"read", "write"}
 
 
 class FakeClient:
-    """Returns queued outputs in order. A list item is a list of (tool, args) calls; a str is the final text."""
+    """Returns queued outputs in order. A list item is a list of (tool, args) calls; a str is the final
+    text; an exception instance is raised (Ollama down, or a crash)."""
 
     def __init__(self, outputs):
         self.outputs = list(outputs)
@@ -37,6 +38,8 @@ class FakeClient:
     def chat(self, model, messages, **kw):
         self.requests.append({"model": model, "messages": list(messages), **kw})
         out = self.outputs.pop(0)
+        if isinstance(out, BaseException):
+            raise out
         if isinstance(out, list):
             calls = [{"function": {"name": n, "arguments": a}} for n, a in out]
             return ChatResult(model=model, content="", tool_calls=calls,

@@ -3,10 +3,11 @@
 Each plugin agent is a Stage: a prompt, a tool allow-list and a permission set. Its skills
 are tools (qa_tools.py) and its hooks are checks inside those tools.
 
-  run_agents(...)         the model chooses the tool calls
+  run_agents(...)         the model chooses the tool calls (M8 loop per stage, fixed order)
   run_deterministic(...)  the pipeline calls the same tools itself (no model): the reference run
+  state_machine.run_sm    the same stages inside INTAKE -> ... -> DONE, with a router (M9-M11)
 
-Both clear reports/<code>/ first (README: "clear reports/<course_code>/ before reviewing
+All clear reports/<code>/ first (README: "clear reports/<course_code>/ before reviewing
 again"), and skip curriculum-auditor when the form gate F.1 failed.
 """
 from __future__ import annotations
@@ -16,6 +17,7 @@ from pathlib import Path
 from . import qa_tools  # noqa: F401  (registers the tools)
 from . import data_store as ds
 from .agent_loop import AgentResult, Stage, run_stage
+from .completion import CHECKS
 from .executor import execute
 from .harness import Harness
 from .logger import new_run_id
@@ -51,6 +53,12 @@ STAGES = {
         allowed=RW),          # no 'dangerous': cannot resolve findings
 }
 
+TASKS = {
+    "course-reviewer": "Review the course specification at {path}. Course code: {code}.",
+    "curriculum-auditor": "Audit the course specification at {path}. Course code: {code}.",
+    "verdict-writer": "Write the review note for course {code} (spec: {path}).",
+}
+
 
 def _code_of(path: str) -> str:
     p = ds.resolve_spec(path)
@@ -71,25 +79,28 @@ def _prepare(path: str, fresh: bool) -> str:
     return code
 
 
-def run_agents(h: Harness, path: str, *, fresh: bool = True) -> dict:
-    """Run the three model-driven stages on one spec."""
+def run_agents(h: Harness, path: str, *, fresh: bool = True, profile: str | None = None) -> dict:
+    """Run the three model-driven stages on one spec. `profile` forces one model for every
+    stage (the single-model baseline); otherwise each stage uses its `agents:` profile."""
     code = _prepare(path, fresh)
     run_id = new_run_id()
     results: list[AgentResult] = []
 
-    def go(name: str, task: str) -> None:
+    def go(name: str) -> None:
         a = h.config_agents.get(name, {})
-        results.append(run_stage(h, STAGES[name], task, profile=a.get("profile", "reasoning"),
-                                 max_steps=a.get("max_steps", 8), run_id=run_id))
+        results.append(run_stage(h, STAGES[name], TASKS[name].format(path=path, code=code),
+                                 profile=profile or a.get("profile", "reasoning"),
+                                 max_steps=a.get("max_steps", 8), max_errors=a.get("max_errors", 4),
+                                 check=lambda: CHECKS[name](path), run_id=run_id))
 
-    go("course-reviewer", f"Review the course specification at {path}. Course code: {code}.")
+    go("course-reviewer")
     if not ds.findings_path(code).exists():
         # the model never recorded anything: record the structure check so later stages have a file
         execute({"function": {"name": "record_check_results", "arguments": {"path": path, "check": "structure"}}},
                 allowed=set(RW), logger=h.log, run_id=run_id)
     if not _f1_failed(code):
-        go("curriculum-auditor", f"Audit the course specification at {path}. Course code: {code}.")
-    go("verdict-writer", f"Write the review note for course {code} (spec: {path}).")
+        go("curriculum-auditor")
+    go("verdict-writer")
     return _summary(code, run_id, results)
 
 
@@ -113,11 +124,16 @@ def run_deterministic(h: Harness, path: str, *, fresh: bool = True) -> dict:
     return _summary(code, run_id, [])
 
 
+def stage_row(r: AgentResult) -> dict:
+    return {"stage": r.stage, "profile": r.profile, "steps": r.steps, "stopped": r.stopped,
+            "verified": r.verified, "tool_calls": len(r.calls), "tool_errors": len(r.errors),
+            "wall_s": round(r.wall_s, 2),
+            "load_s": round(sum(t["load_s"] for t in r.trace), 2)}
+
+
 def _summary(code: str, run_id: str, results: list[AgentResult]) -> dict:
     return {"course_code": code, "run_id": run_id, "verdict": compute_verdict(ds.load_findings(code)),
-            "f1_failed": _f1_failed(code),
-            "stages": [{"stage": r.stage, "steps": r.steps, "stopped": r.stopped,
-                        "tool_errors": len(r.errors), "wall_s": round(r.wall_s, 2)} for r in results]}
+            "f1_failed": _f1_failed(code), "stages": [stage_row(r) for r in results]}
 
 
 def finish_batch(h: Harness, paths: list[str], codes: list[str]) -> None:

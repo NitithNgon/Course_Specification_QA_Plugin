@@ -434,7 +434,7 @@ class BatchArgs(Args):
 @tool(permission="write")
 def write_batch_summary(args: BatchArgs) -> dict:
     """Write reports/COURSE_SPEC_REVIEW.md, one row per course, from the findings on disk.
-    Verdicts come from the fixed policy table."""
+    Verdicts come from the fixed policy table; a course the state machine escalated shows ESCALATED."""
     rows = []
     for code in args.course_codes:
         v = rules.compute_verdict(ds.load_findings(code))
@@ -442,7 +442,8 @@ def write_batch_summary(args: BatchArgs) -> dict:
         m = re.search(rf"# Review Note — {re.escape(code)}: (.*)", note.read_text(encoding="utf-8")) \
             if note.is_file() else None
         c = v["open_counts"]
-        rows.append(f"| {code} | {m[1].strip() if m else '(no note)'} | {v['verdict']} | "
+        verdict = "ESCALATED" if (ds.course_dir(code) / "ESCALATION.md").is_file() else v["verdict"]
+        rows.append(f"| {code} | {m[1].strip() if m else '(no note)'} | {verdict} | "
                     f"{c['blocker']} | {c['major']} | {c['minor']} |")
     text = "\n".join([f"# Course Spec Review — {date.today().isoformat()}", "",
                       "| Course Code | Course Name | Verdict | Blockers | Majors | Minors |",

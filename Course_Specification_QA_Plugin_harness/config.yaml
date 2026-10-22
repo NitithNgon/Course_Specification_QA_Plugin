@@ -23,10 +23,29 @@ profiles:
     keep_alive: 10m
     think: false
 
-agents:                    # which profile each pipeline stage uses, and its step budget
-  course-reviewer:    {profile: reasoning, max_steps: 8}
-  curriculum-auditor: {profile: reasoning, max_steps: 10}
-  verdict-writer:     {profile: fast,      max_steps: 4}
+agents:                    # per stage: profile for --mode agents, step budget, error budget (M8)
+  course-reviewer:    {profile: reasoning, max_steps: 8,  max_errors: 4}
+  curriculum-auditor: {profile: reasoning, max_steps: 10, max_errors: 4}
+  verdict-writer:     {profile: fast,      max_steps: 4,  max_errors: 3}
+
+routing:                   # M11 - rule-based router used by --mode sm (the state machine)
+  routes:                  # kind of work -> profile
+    classify: fast         # CLASSIFY, only when the rules cannot decide
+    gate:     fast         # course-reviewer on an off-form document: record F.1, nothing else
+    review:   reasoning    # course-reviewer on the official form
+    audit:    fast         # curriculum-auditor when the rules classify every CLO verb
+    judge:    reasoning    # curriculum-auditor when a CLO needs a Bloom-level judgment
+    write:    fast         # verdict-writer
+  default: reasoning       # a kind missing from the table
+  long_context: reasoning  # when the estimated prompt passes ctx_ratio x num_ctx
+  ctx_ratio: 0.8
+  ladder: [fast, reasoning]  # after a failed attempt, move one rung up. To add a stronger
+                             # profile, put it last; it must support tool calling
+                             # (`ollama show <model>` lists "tools" under Capabilities)
+  fallback_after: 1        # failed attempts per rung
+
+state_machine:             # M9
+  max_replans: 2           # VERIFY -> PLAN at most this many times, then ESCALATE
 
 logging:
   file: logs/calls.jsonl

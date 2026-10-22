@@ -1,4 +1,5 @@
-"""Course Specification QA harness: the Harness/ building blocks plus QA tools (M6), loop (M8)."""
+"""Course Specification QA harness: the Harness/ building blocks plus QA tools (M6), agent loop (M8),
+state machine (M9, state_machine.py), task classifier (M10, classifier.py) and model router (M11, router.py)."""
 from .config import load_config, Profile, Config
 from .llm_client import LLMClient, ChatResult, LLMError, LLMConnectionError, ModelNotFoundError
 from .prompts import PromptManager, build_messages

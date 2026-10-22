@@ -1,0 +1,8 @@
+You classify ONE course specification for a QA review pipeline. You are given facts the harness extracted from the document. Return JSON only, matching the schema.
+
+task_type:
+- "off_form": the document is not on the official course-specification form (form gate parts are missing).
+- "needs_judgment": on the form, and at least one CLO has no student verb the rules could classify.
+- "standard": on the form, and every CLO verb is classified.
+
+reason: one short sentence naming the fact that decided it.

@@ -28,6 +28,17 @@ class Profile:
 
 
 @dataclass
+class Routing:
+    """M11 - router table: kind of work -> profile, plus the long-context and fallback rules."""
+    routes: dict[str, str]
+    default: str
+    long_context: str
+    ladder: list[str]                 # weakest -> strongest; a failed attempt moves up one rung
+    fallback_after: int = 1
+    ctx_ratio: float = 0.8
+
+
+@dataclass
 class Config:
     base_url: str
     api: str
@@ -35,11 +46,29 @@ class Config:
     profiles: dict[str, Profile]
     log_file: Path
     agents: dict[str, dict] = field(default_factory=dict)
+    routing: Routing | None = None
+    max_replans: int = 2
 
     def profile(self, name: str) -> Profile:
         if name not in self.profiles:
             raise KeyError(f"Unknown profile {name!r}. Known: {list(self.profiles)}")
         return self.profiles[name]
+
+
+def _routing(data: dict, profiles: dict[str, Profile]) -> Routing:
+    """Read the routing block; every profile it names must exist (fail at load, not mid-run)."""
+    biggest = max(profiles, key=lambda n: profiles[n].options.get("num_ctx", 0))
+    default = data.get("default", "reasoning" if "reasoning" in profiles else biggest)
+    r = Routing(routes=dict(data.get("routes", {})), default=default,
+                long_context=data.get("long_context", biggest),
+                ladder=list(data.get("ladder", profiles)),
+                fallback_after=int(data.get("fallback_after", 1)),
+                ctx_ratio=float(data.get("ctx_ratio", 0.8)))
+    named = [*r.routes.values(), r.default, r.long_context, *r.ladder]
+    unknown = sorted({n for n in named if n not in profiles})
+    if unknown:
+        raise KeyError(f"routing names unknown profiles {unknown}. Known: {list(profiles)}")
+    return r
 
 
 def load_config(path: str | Path = DEFAULT_CONFIG) -> Config:
@@ -62,4 +91,6 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Config:
         profiles=profiles,
         log_file=log_file,
         agents=data.get("agents", {}),
+        routing=_routing(data.get("routing", {}), profiles),
+        max_replans=int(data.get("state_machine", {}).get("max_replans", 2)),
     )
