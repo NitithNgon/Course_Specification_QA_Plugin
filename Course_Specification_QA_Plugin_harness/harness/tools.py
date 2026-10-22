@@ -26,7 +26,7 @@ PERMISSIONS = ("read", "write", "dangerous")
 
 @dataclass
 class ToolSpec:
-    name: str
+    name: st
     fn: Callable
     args: type[BaseModel]
     description: str

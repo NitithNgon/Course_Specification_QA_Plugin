@@ -1,130 +1,250 @@
-"""Deterministic parser for the course_specification.md template.
+"""Deterministic parser for the official CU course-specification form (English rendering).
 
-Pure functions, no model involved. Every extracted item keeps the verbatim source
-line (`raw`) so findings can quote the document exactly.
+Follows references/course-spec-template.md. Every extracted item keeps its 1-based line
+number and the verbatim line, so a finding can point at the row and quote it exactly.
+Sections are keyed by their English heading, lowercased, without the Thai in brackets:
+"## Assessment (การประเมินผลการเรียน)" -> "assessment".
 """
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 
-BLOOM_LEVELS = ("Remember", "Understand", "Apply", "Analyze", "Evaluate", "Create")
-POLICY_KEYS = {  # policy -> keywords found in the bullet label
-    "attendance": ("attendance",),
-    "deadlines": ("deadline", "late"),
-    "academic_integrity": ("academic integrity",),
-    "plagiarism": ("plagiarism", "citation"),
-    "ai_tools": ("ai tool", "critical use"),
-}
-_EMPTY = {"", "-", "—", "–", "n/a", "na", "none", "tbd"}
+from .data_store import LEVELS
+
+EMPTY = {"", "-", "—", "–"}
+PLO_RE = re.compile(r"\bPLO\s?\d+\b", re.IGNORECASE)
+CLO_RE = re.compile(r"\bCLO\s?\d+\b", re.IGNORECASE)
+
+
+def is_empty(value: str | None) -> bool:
+    return value is None or value.strip() in EMPTY
+
+
+def english(label: str) -> str:
+    """'Course code (รหัสรายวิชา)' -> 'course code'."""
+    return re.sub(r"\s*\([^)]*[^\x00-\x7F][^)]*\)", "", label).strip().lower()
+
+
+def plo_ids(text: str) -> list[str]:
+    return [re.sub(r"\s", "", m).upper() for m in PLO_RE.findall(text or "")]
+
+
+def clo_ids(text: str) -> list[str]:
+    return [re.sub(r"\s", "", m).upper() for m in CLO_RE.findall(text or "")]
+
+
+@dataclass
+class Line:
+    no: int
+    text: str
+
+
+@dataclass
+class Table:
+    header: list[str]               # lowercased English header cells
+    header_line: Line
+    rows: list[tuple[Line, list[str]]]
+
+    def col(self, *names: str) -> int | None:
+        for k, h in enumerate(self.header):
+            if any(n in h for n in names):
+                return k
+        return None
+
+
+@dataclass
+class Section:
+    title: str                      # heading as printed
+    key: str                        # English, lowercased
+    line: Line
+    level: int                      # 2 for ##, 3 for ###
+    body: list[Line] = field(default_factory=list)      # non-blank, non-table lines
+    tables: list[Table] = field(default_factory=list)
+
+    def is_dash(self) -> bool:
+        """Section printed as a lone '-' (or with nothing at all)."""
+        return not self.tables and all(is_empty(b.text.lstrip("- ").strip()) or b.text.strip() == "-"
+                                       for b in self.body)
+
+    def dash_line(self) -> Line:
+        return next((b for b in self.body if b.text.strip() == "-"), self.line)
+
+    def kv(self) -> dict[str, tuple[str, Line]]:
+        """Field | Value tables -> {english field: (value, line)}."""
+        out = {}
+        for t in self.tables:
+            if t.header[:2] == ["field", "value"]:
+                for ln, cells in t.rows:
+                    if len(cells) >= 2:
+                        out[english(cells[0])] = (cells[1], ln)
+        return out
 
 
 @dataclass
 class CLO:
     id: str
-    description: str
-    bloom: str
+    text: str
+    plo_cell: str
     plos: list[str]
-    raw: str
+    line: Line
 
 
 @dataclass
-class Assessment:
-    component: str
-    weight: float | None
+class Method:
+    name: str
+    level_cell: str
+    level: str | None               # Bloom level named in the cell, if any
+    clo_cell: str
     clos: list[str]
-    raw: str
+    weight_cell: str
+    weight: float | None
+    line: Line
 
 
 @dataclass
 class Spec:
     path: str
-    course_code: str | None = None
-    course_name: str | None = None
-    clos: list[CLO] = field(default_factory=list)
-    assessments: list[Assessment] = field(default_factory=list)
-    stated_total: float | None = None
-    rubric_items: int = 0
-    policies: dict[str, str] = field(default_factory=dict)  # policy -> verbatim bullet
-    sections_found: list[str] = field(default_factory=list)
+    lines: list[str]
+    sections: dict[str, Section]
+    clo_table: Table | None
+    assessment_table: Table | None
+    grade_table: Table | None
+    clos: list[CLO]
+    methods: list[Method]
 
-    def to_dict(self) -> dict:
-        return asdict(self)
+    # --------------------------------------------------------------- helpers
+    def sec(self, key: str) -> Section | None:
+        return self.sections.get(key)
+
+    def info(self) -> dict[str, tuple[str, Line]]:
+        s = self.sec("course information")
+        return s.kv() if s else {}
+
+    def field(self, section_key: str, name: str) -> tuple[str, Line] | None:
+        s = self.sec(section_key)
+        return s.kv().get(name) if s else None
+
+    @property
+    def course_code(self) -> str | None:
+        v = self.info().get("course code")
+        if v and not is_empty(v[0]):
+            return v[0].strip()
+        m = re.search(r"Course code:\s*([A-Za-z]{2,5}\s?\d{3,4})", "\n".join(self.lines))
+        return m[1].replace(" ", "") if m else None
+
+    @property
+    def course_title(self) -> str | None:
+        info = self.info()
+        for k in ("course title, english", "course title, thai"):
+            if k in info and not is_empty(info[k][0]):
+                return info[k][0]
+        m = re.search(r"Course (?:title|name)[^:\n]*:\s*(.+)", "\n".join(self.lines))
+        if m:
+            return m[1].strip()
+        first = self.lines[0].lstrip("# ").strip() if self.lines else ""
+        return first or None
+
+    def instructors(self) -> list[tuple[str, Line]]:
+        s = self.sec("instructors")
+        out = []
+        for t in (s.tables if s else []):
+            k = t.col("instructor")
+            for ln, cells in t.rows:
+                if k is not None and k < len(cells) and not is_empty(cells[k]):
+                    out.append((cells[k], ln))
+        return out
+
+    def related_plo_lines(self) -> list[Line]:
+        s = self.sec("program learning outcomes related to the course")
+        return [b for b in s.body] if s else []
+
+    def assessment_note(self) -> list[Line]:
+        s = self.sec("assessment note")
+        return s.body if s else []
+
+    def grades(self) -> list[tuple[str, float | None, Line]]:
+        if not self.grade_table:
+            return []
+        g, t = self.grade_table.col("grade"), self.grade_table.col("threshold")
+        out = []
+        for ln, cells in self.grade_table.rows:
+            m = re.search(r"-?\d+(?:\.\d+)?", cells[t]) if t is not None and t < len(cells) else None
+            out.append((cells[g].strip(), float(m[0]) if m else None, ln))
+        return out
+
+    def text_outside(self, *excluded_keys: str) -> list[Line]:
+        """Every line not inside the given sections (used by the 6.x presence checks)."""
+        skip = set()
+        for k in excluded_keys:
+            s = self.sec(k)
+            if s:
+                end = min((o.line.no for o in self.sections.values() if o.line.no > s.line.no
+                           and o.level <= s.level), default=len(self.lines) + 1)
+                skip.update(range(s.line.no, end))
+        return [Line(i, t) for i, t in enumerate(self.lines, 1) if i not in skip]
 
 
 def _cells(line: str) -> list[str]:
     return [c.strip() for c in line.strip().strip("|").split("|")]
 
 
-def _tables(text: str):
-    """Yield (header_cells, [(raw_line, cells)]) for each markdown table."""
+def parse_spec(text: str, path: str = "") -> Spec:
     lines = text.splitlines()
+    sections: dict[str, Section] = {}
+    order: list[Section] = []
+    cur: Section | None = None
     i = 0
     while i < len(lines):
-        if (lines[i].lstrip().startswith("|") and i + 1 < len(lines)
-                and re.match(r"^\s*\|[\s:\-|]+\|\s*$", lines[i + 1])):
-            header = [h.lower() for h in _cells(lines[i])]
-            rows, i = [], i + 2
-            while i < len(lines) and lines[i].lstrip().startswith("|"):
-                rows.append((lines[i].strip(), _cells(lines[i])))
-                i += 1
-            yield header, rows
-        else:
+        raw = lines[i]
+        m = re.match(r"^(#{2,3})\s+(.+?)\s*$", raw)
+        if m:
+            cur = Section(m[2], english(m[2]), Line(i + 1, raw), len(m[1]))
+            sections.setdefault(cur.key, cur)
+            order.append(cur)
             i += 1
+            continue
+        if (raw.lstrip().startswith("|") and i + 1 < len(lines)
+                and re.match(r"^\s*\|[\s:\-|]+\|\s*$", lines[i + 1])):
+            t = Table([english(h) for h in _cells(raw)], Line(i + 1, raw), [])
+            i += 2
+            while i < len(lines) and lines[i].lstrip().startswith("|"):
+                t.rows.append((Line(i + 1, lines[i]), _cells(lines[i])))
+                i += 1
+            if cur is not None:
+                cur.tables.append(t)
+            continue
+        if raw.strip() and cur is not None:
+            cur.body.append(Line(i + 1, raw))
+        i += 1
 
+    all_tables = [t for s in order for t in s.tables]
+    clo_table = next((t for t in all_tables if t.header and "clo" in t.header[0]
+                      and t.col("plo") is not None), None)
+    assessment_table = next((t for t in all_tables if t.col("level") is not None
+                             and t.col("clo") is not None), None)
+    grade_table = next((t for t in all_tables if t.col("grade") is not None
+                        and t.col("threshold") is not None), None)
 
-def _col(header: list[str], name: str) -> int | None:
-    for k, h in enumerate(header):
-        if name in h:
-            return k
-    return None
+    clos = []
+    if clo_table:
+        o, p = clo_table.col("outcome", "description"), clo_table.col("plo")
+        for ln, c in clo_table.rows:
+            cell = c[p] if p is not None and p < len(c) else ""
+            clos.append(CLO(c[0].upper().replace(" ", ""),
+                            c[o] if o is not None and o < len(c) else "", cell, plo_ids(cell), ln))
 
+    methods = []
+    if assessment_table:
+        t = assessment_table
+        k, lv, cl, w = t.col("method"), t.col("level"), t.col("clo"), t.col("percent", "weight")
+        for ln, c in t.rows:
+            get = lambda j: c[j] if j is not None and j < len(c) else ""  # noqa: E731
+            level = next((L for L in LEVELS if re.search(rf"\b{L}\b", get(lv), re.I)), None)
+            try:
+                weight = float(get(w).replace("%", "").replace(",", "").strip())
+            except ValueError:
+                weight = None
+            methods.append(Method(get(k), get(lv), level, get(cl), clo_ids(get(cl)), get(w), weight, ln))
 
-def _get(cells: list[str], idx: int | None) -> str:
-    return cells[idx] if idx is not None and idx < len(cells) else ""
-
-
-def split_ids(cell: str) -> list[str]:
-    """'CLO1, CLO2' / 'PLO1; PLO3' -> list. '-', 'n/a', '' -> []"""
-    if cell.strip().lower() in _EMPTY:
-        return []
-    return [t for t in re.split(r"[,;/\s]+", cell.strip()) if t]
-
-
-def parse_spec(text: str, path: str = "") -> Spec:
-    s = Spec(path=path)
-    if m := re.search(r"\*\*Course Code:\*\*[ \t]*(.*)", text):
-        s.course_code = m[1].strip() or None
-    if m := re.search(r"\*\*Course Name:\*\*[ \t]*(.*)", text):
-        s.course_name = m[1].strip() or None
-    s.sections_found = re.findall(r"^##\s+(.+?)\s*$", text, re.MULTILINE)
-
-    for header, rows in _tables(text):
-        if _col(header, "clo") == 0 and _col(header, "bloom") is not None:
-            d, b, p = _col(header, "description"), _col(header, "bloom"), _col(header, "plo")
-            for raw, c in rows:
-                s.clos.append(CLO(id=c[0], description=_get(c, d), bloom=_get(c, b),
-                                  plos=split_ids(_get(c, p)), raw=raw))
-        elif _col(header, "component") is not None and _col(header, "weight") is not None:
-            k, w, m = _col(header, "component"), _col(header, "weight"), _col(header, "clo")
-            for raw, c in rows:
-                try:
-                    weight = float(_get(c, w).replace("%", "").strip())
-                except ValueError:
-                    weight = None
-                s.assessments.append(Assessment(component=_get(c, k), weight=weight,
-                                                clos=split_ids(_get(c, m)), raw=raw))
-
-    if m := re.search(r"\*\*Total:\s*([\d.]+)", text):
-        s.stated_total = float(m[1])
-
-    if m := re.search(r"^#{2,4}[ \t]*Scoring Criteria[^\n]*\n(.*?)(?=^#{1,4}\s|\Z)", text,
-                      re.MULTILINE | re.DOTALL | re.IGNORECASE):
-        s.rubric_items = len(re.findall(r"^\s*[-*]\s+\S", m[1], re.MULTILINE))
-
-    for m in re.finditer(r"^\s*[-*]\s+\*\*([^*:]+):?\*\*:?[ \t]*(.*)$", text, re.MULTILINE):
-        label = m[1].strip().lower()
-        for key, words in POLICY_KEYS.items():
-            if any(w in label for w in words) and m[2].strip():
-                s.policies.setdefault(key, m[0].strip())
-    return s
+    return Spec(path, lines, sections, clo_table, assessment_table, grade_table, clos, methods)
